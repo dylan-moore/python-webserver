@@ -18,17 +18,25 @@ bufferSize = 128 * 1024
 rootFolder = "www"
 
 def getFile(file):
-        fileHandle = open(file, "r")
-        fileContents = fileHandle.read()
-        fileHandle.close()
-        return fileContents
+        try:
+                fileHandle = open(file, "r")
+                fileContents = fileHandle.read()
+                fileHandle.close()
+                return fileContents
+        except:
+                return False
+
+def serverMessage(message, colour):     #will add more formatting later on
+        return "<h3><font color='{col}'>{msg}</font></h3>".format(msg=message, col=colour)
 
 def genHeaders(responseCode):
         header = ''
         if responseCode == 200:
-            header += 'HTTP/1.1 200 OK\n'
+                header += "HTTP/1.1 200 OK\n"
         elif responseCode == 404:
-            header += 'HTTP/1.1 404 Not Found\n'
+                header += "HTTP/1.1 404 Not Found\n"
+        elif responseCode == 501:
+                header += "HTTP/1.1 501 Not Implemented\n" 
 
         timeNow = time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime())
         header += 'Date: {now}\n'.format(now=timeNow)
@@ -49,7 +57,7 @@ def parseHeader(header, param):
                                 return param_split[1]
 
 def handleClient(clientConnection):
-        timerStart = int(time.time() * 1000)
+        timerStart = time.time() * 1000
         data = clientConnection.recv(bufferSize).decode()
         if not data:
             return
@@ -62,17 +70,26 @@ def handleClient(clientConnection):
         if requestMethod == "GET":
                 responseHeader = genHeaders(200)
                 requestedPage = parseHeader(data, "page")
+                print("A client requested : {req}\r\n".format(req=requestedPage))
                 if requestedPage == "/":
                         responseData = getFile(rootFolder + "/index.html")
                 else:
                         responseData = getFile(rootFolder + requestedPage)
+        else:
+                responseHeader = genHeaders(501)
+                responseData = serverMessage("Unknown request method '{reqmethod}'".format(reqmethod=requestMethod), "red")      
+
+        if responseData == False:
+                responseHeader = genHeaders(404)
+                responseData = serverMessage("Error 404, the page you are looking for cannot be found.", "red")
 
         response = responseHeader.encode()
-        if requestMethod == "GET":
-                responseData = responseData
-                responseData += "\n\nIt took a incredible {timetook}ms to generate this page".format(timetook=str((time.time() * 1000)-timerStart))
-                response += responseData.encode()
-        conn.send(response)        
+        responseData = responseData
+        timeTook = round((time.time() * 1000)-timerStart)
+        responseData += "\n\nIt took a incredible {genin}ms to generate this page".format(genin=timeTook)
+        response += responseData.encode()
+        
+        conn.send(response)
         conn.close()
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
