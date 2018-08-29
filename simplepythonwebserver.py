@@ -12,10 +12,6 @@ import threading
 # 4) The server sends over the page that the client has requested.
 # 5) Connection terminates and client is left with a fully loaded webpage on their side.
 
-# This webserver is vulnerable to the SlowLoris attack that Apache webservers are also vulnerable to.
-# Basially, if you just send the webserver half a http request then one byte every so often (just to keep the connection alive) it will keep the handling _
-# thread open which will eventually cause the webserver to not be able to handle any more clients.
-
 bindIp = '127.0.0.1'
 httpPort = 80
 bufferSize = 128 * 1024
@@ -74,7 +70,7 @@ def handleClient(clientConnection):
         response = responseHeader.encode()
         if requestMethod == "GET":
                 responseData = responseData
-                responseData += "\n\nIt took a incredible " + str((time.time() * 1000)-timerStart) + "ms to generate this page"
+                responseData += "\n\nIt took a incredible {timetook}ms to generate this page".format(timetook=str((time.time() * 1000)-timerStart))
                 response += responseData.encode()
         conn.send(response)        
         conn.close()
@@ -86,4 +82,3 @@ s.listen(5)
 while True:
         conn, addr = s.accept()
         threading.Thread(target=handleClient,args=(conn,)).start()
-
