@@ -84,7 +84,6 @@ def handleClient(clientConnection):
                 responseData = serverMessage("Error 404, the page you are looking for cannot be found.", "red")
 
         response = responseHeader.encode()
-        responseData = responseData
         timeTook = round((time.time() * 1000)-timerStart)
         responseData += "\n\nIt took a incredible {genin}ms to generate this page".format(genin=timeTook)
         response += responseData.encode()
