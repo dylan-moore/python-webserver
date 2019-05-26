@@ -15,6 +15,7 @@ Config file:
 The config file is in the same directory as server.py by default, you can also load a different config file by adding it as a console argument when starting the script.
 The config file uses the JSON format.
 Data in parenthesis is the datatype and default that will be used if not set in config file.
+
     - port (integer : 80)
         This is the port the server will listen on.
     - localonly (boolean : false):
