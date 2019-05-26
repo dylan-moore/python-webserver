@@ -4,12 +4,12 @@ ALPHA v0.2
 DSWS is a simple python web server designed to be deployed within seconds of being downloaded.
 
 How to configure:
-    
-    DSWS has been designed to be as user friendly to use as possible.
-        1) Clone this git repository into a directory.
-        2) Make sure your machine has atleast python 3.6 installed (due to fstrings being introduced in 3.6)
-        3) Configure the server to your needs (how to use the config file documentation down below)
-        4) Run the server using python.
+DSWS has been designed to be as user friendly to use as possible.
+        
+    1) Clone this git repository into a directory.
+    2) Make sure your machine has atleast python 3.6 installed (due to fstrings being introduced in 3.6)
+    3) Configure the server to your needs (how to use the config file documentation down below)
+    4) Run the server using python.
 
 Config file:
 The config file is in the same directory as server.py by default, you can also load a different config file by adding it as a console argument when starting the script.
