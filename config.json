@@ -1,0 +1,27 @@
+{
+    "hostname": "imdylan.me",
+    "port": 8888,
+    "local_only": true,
+
+    "scripting_enable": true,
+    "buffer_size": 128,
+    "gzip_compress": true,
+
+    "ssl_enable": false,
+    "ssl_cert": "cert.crt",
+
+    "files_location": "www",
+    "files_redirect": {
+        "/": "index.html"
+    },
+
+    "cache_enable": true,
+    "cache_specific": [
+        "index.html",
+        "*.png"
+    ],
+
+    "logging_enable": true,
+    "logging_onlyfatal": true,
+    "logging_file": "server.log"
+}

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"> 
+<title>AQA VM - Dylan Moore</title>
+</head>
+<body>
+
+<style>
+	.split {
+		height: 100%;
+		width: 50%;
+		position: fixed;
+		z-index: 1;
+		top: 0;
+		overflow-x: hidden;
+		padding-top: 20px;
+	}
+
+	.left {
+		left: 0;
+	}
+
+	.right {
+		right: 0;
+	}
+
+	.centered {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		text-align: center;
+	}
+</style>
+
+<center>
+	<h1>AQA syntax assembly virtual machine</h1>
+	<i>Written by Dylan Moore</i>
+</center>
+
+<div class="split left">
+	<div class="centered">
+		<h3>Source code entry</h3>
+		<textarea id="source" rows="15" cols="30" placeholder="enter code"></textarea>
+		<br>
+		<button type="button" onclick="createVM()">Create VM</button>
+		<button type="button" onclick="stepVM()">Step Instruction</button>
+	</div>
+</div>
+
+<div class="split right">
+	<div class="centered">
+		<h3>Virtual machine</h3>
+		<b>VM Status</b>
+		<p id="status">Pending...</p>
+		<b>Instruction pointer</b>
+		<p id="eip">0</p>
+		<b>Comparison result</b>
+		<p id="cmp">NONE</p>
+		<b>Registers</b>
+		<p id="r0">0</p>
+		<p id="r1">0</p>
+		<p id="r2">0</p>
+		<p id="r3">0</p>
+		<p id="r4">0</p>
+		<p id="r5">0</p>
+		<p id="r6">0</p>
+		<p id="r7">0</p>
+		<p id="r8">0</p>
+		<p id="r9">0</p>
+		<p id="r10">0</p>
+		<p id="r11">0</p>
+		<p id="r12">0</p>
+	</div>
+</div>
+
+<script>
+	var vm;
+
+	class virtualMachine {
+		
+		constructor(iA) {
+			this.instructionsArray = iA;
+			this.memory = [];
+			this.registers = [0,0,0,0,0,0,0,0,0,0,0,0,0];
+			this.labels = [];
+			this.eip = 0;
+			this.comparison = "NONE";
+		}
+		
+		readOperand(op)	{
+			if (op.startsWith("#")){
+				return parseInt(op.replace("#",""));
+			} else if (op.startsWith("r")) {
+				return parseInt(this.registers[op.replace("r","")]);
+			} else {
+				return parseInt(this.memory[op]);
+			}
+		}
+		
+		setOperand(op, data) {
+			if (op.startsWith("r")) {
+				this.registers[op.replace("r","")] = data;
+			} else {
+				this.memory[op] = data;
+			}
+		}
+			
+		findLabel(labelName) {
+			var labelPointer = "";
+			for (var i = 0; i < this.instructionsArray.length; i++) {
+				if (this.instructionsArray[i].startsWith(labelName)) {
+					labelPointer = i;
+					break;
+				}
+			}
+			if (labelPointer == ""){
+				console.log("no such label exists!");
+				return "";
+			} else {
+				return labelPointer;
+			}
+		}
+			
+		executeInstruction() {
+			var instructSplit = this.instructionsArray[this.eip].split(" ");
+			var opCode = instructSplit.shift();
+			document.getElementById("status").innerHTML = "Executing : " + this.instructionsArray[this.eip];
+			var parameters = instructSplit.join("").split(",");
+
+			if (opCode.startsWith("&")) { // Setting memory
+				var memoryStore = this.instructionsArray[this.eip].split(":")
+				this.memory[memoryStore[0].replace("&","")] = memoryStore[1];
+			} else if (opCode == "LDR") { // Load		
+				this.setOperand(parameters[0], this.readOperand(parameters[1]));
+			} else if (opCode == "STR") { // Store
+				this.setOperand(parameters[1], this.readOperand(parameters[0]));
+			} else if (opCode == "ADD") { // Add
+				this.setOperand( parameters[0], this.readOperand(parameters[1]) + this.readOperand(parameters[2]) );
+			} else if (opCode == "SUB") { // Subtract
+				this.setOperand( parameters[0], this.readOperand(parameters[1]) - this.readOperand(parameters[2]) );
+			} else if (opCode == "MOV") { // Move
+				this.setOperand( parameters[0], this.readOperand(parameters[1]) );
+			} else if (opCode == "CMP") { // Compare
+				var op0 = this.readOperand(parameters[0]);
+				var op1 = this.readOperand(parameters[1]);
+				if ( op0 == op1 ) {
+					this.comparison = "EQ";
+				} else if ( op0 > op1 ) {
+					this.comparison = "GT";
+				} else if ( op0 < op1 ) {
+					this.comparison = "LT";
+				} else if ( op0 != op1 ) {
+					this.comparison = "NE";
+				}
+			} else if (opCode.startsWith("B")) {
+				if (opCode == "B"){
+					this.eip = this.findLabel(parameters[0]);
+				} else if (opCode == ("B" + this.comparison)) {
+					this.eip = this.findLabel(parameters[0]);
+				}
+			} else if (opCode == "AND") { // Bitwise AND
+				this.setOperand( parameters[0], this.readOperand(parameters[1]) & this.readOperand(parameters[2]) );
+			} else if (opCode == "ORR") { // Bitwise OR
+				this.setOperand( parameters[0], this.readOperand(parameters[1]) | this.readOperand(parameters[2]) );
+			} else if (opCode == "EOR") { // Bitwise XOR
+				this.setOperand( parameters[0], this.readOperand(parameters[1]) ^ this.readOperand(parameters[2]) );
+			} else if (opCode == "MVN") { // Bitwise NOT
+				this.setOperand( parameters[0], ~this.readOperand(parameters[1]) );	
+			} else if (opCode == "LSL") { // Logical shift left
+				this.setOperand( parameters[0], this.readOperand(parameters[1]) << this.readOperand(parameters[2]) );
+			} else if (opCode == "LSR") { // Logical shift right
+				this.setOperand( parameters[0], this.readOperand(parameters[1]) >> this.readOperand(parameters[2]) );				
+			} else if (opCode == "HALT") { // Halt execution
+				document.getElementById("status").innerHTML = "Halted!";
+			}
+		}
+		
+		displayInformation() {
+			document.getElementById("eip").innerHTML = this.eip;
+			document.getElementById("cmp").innerHTML = this.comparison;
+			for (var i = 0; i < this.registers.length; i++){
+				document.getElementById("r" + i.toString()).innerHTML = this.registers[i];
+			}
+		}
+		
+		stepInstruction() {
+			if (this.eip >= this.instructionsArray.length) {
+				console.log("no more instructions!");
+			} else {
+				this.executeInstruction();
+				this.displayInformation();
+				this.eip++;
+			}
+		}
+		
+	}
+	
+	function createVM() {
+		var iA = document.getElementById("source").value.split("\n");
+		vm = new virtualMachine(iA);
+		document.getElementById("status").innerHTML = "Ready!";		
+	}
+	
+	function stepVM() {
+		vm.stepInstruction();
+	}	
+</script>
+
+</body>
+</html>

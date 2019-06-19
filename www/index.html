@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<head>
+    <title>Dylan Moore</title>
+</head>
+<body>
+    <style>
+        body {
+            padding: 100px;
+            font-family: Arial,Helvetica Neue,Helvetica,sans-serif;
+        }
+        a {
+            text-decoration: none;
+            color: white;
+            border: 1px solid black;
+            padding: 7px;
+            background: grey;
+        }
+        a:hover {
+            background: black;
+        }
+    </style>
+    <script type='text/javascript'>
+        r=0, g=0, b=0;
+        setInterval(() => { r+=5; }, 80);
+        setInterval(() => { g+=5; }, 80*2);
+        setInterval(() => { b+=5; }, 80*3); 
+        setInterval(() => { document.body.style.backgroundColor = 'rgb('+r%255+','+g%255+','+b%255+', 0.25)'; }, 10);
+    </script>
+    <h2>Welcome to my website.</h2>
+    <p>Dylan Moore - Full stack web and systems programmer.</p>
+    <b>Personal</b>
+    <ul>
+        <il><a target='_blank' href='emailto:me@imdylan.me'>Email me</a></il>
+        <il><a target='_blank' href='https://gitlab.com/dyl000'>My Gitlab</a></il>
+        <il><a target='_blank' href='cv.pdf'>My CV</a></il>
+    </ul>
+    <b>My projects</b>
+    <ul>
+        <il><a target='_blank' href='vm.html'>JS little man computer</a></il>
+        <il><a target='_blank' href='https://gitlab.com/dyl000/Python-HTTP-Server'>DSWS (Dylan's Simple Web Server)</a></il>
+        <il><a target='_blank' href='caressay.pdf'>Essay on ethics an logistics of self driving cars and automation.</a></il>
+    </ul>
+    <br>
+    <small>This page is powered by DSWS</small>
+    <br>
+    <img src="img/2.jpg"/>
+    <p><py>res = 5+534567898765432/200</py></p>
+</body>
